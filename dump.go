@@ -5,67 +5,88 @@
 package debug
 
 import (
-	"reflect"
 	"fmt"
+	"reflect"
 	"strconv"
 )
 
 var indent int64 = -1
 
-// Print to standard out the value that is passed as the argument with indentation.
-// Pointers are dereferenced.
-func Dump(v interface{}) {
-	val := reflect.ValueOf(v)
-	dump(val, "")
+type variable struct {
+	Out string
 }
 
-func dump(val reflect.Value, name string) {
+func (v *variable) Dump(val reflect.Value, name string) {
 	indent++
+	//fmt.Printf("%#v\n", val.Interface())
 
-	typ := val.Type()
+	if val.IsValid() {
+		typ := val.Type()
 
-	switch typ.Kind() {
-	case reflect.Array, reflect.Slice:
-		l := val.Len()
-		for i := 0; i < l; i++ {
-			dump(val.Index(i), strconv.Itoa(i))
+		switch typ.Kind() {
+		case reflect.Array, reflect.Slice:
+			v.printType(name, val.Interface())
+			l := val.Len()
+			for i := 0; i < l; i++ {
+				v.Dump(val.Index(i), strconv.Itoa(i))
+			}
+		case reflect.Map:
+			v.printType(name, val.Interface())
+			//l := val.Len()
+			keys := val.MapKeys()
+			for _, k := range keys {
+				v.Dump(val.MapIndex(k), k.Interface().(string))
+			}
+		case reflect.Ptr:
+			v.printType(name, val.Interface())
+			v.Dump(val.Elem(), name)
+		case reflect.Struct:
+			v.printType(name, val.Interface())
+			for i := 0; i < typ.NumField(); i++ {
+				field := typ.Field(i)
+				v.Dump(val.FieldByIndex([]int{i}), field.Name)
+			}
+		default:
+			v.printValue(name, val.Interface())
 		}
-	case reflect.Map:
-		printType(name, val.Interface())
-		//l := val.Len()
-		keys := val.MapKeys()
-		for _, k := range keys {
-			dump(val.MapIndex(k), k.Interface().(string))
-		}
-	case reflect.Ptr:
-		printType(name, val.Interface())
-		dump(val.Elem(), name)
-	case reflect.Struct:
-		printType(name, val.Interface())
-		for i := 0; i < typ.NumField(); i++ {
-			field := typ.Field(i)
-			dump(val.FieldByIndex([]int{i}), field.Name)
-		}
-	default:
-		printValue(name, val.Interface())
+	} else {
+		v.printValue(name, "nil")
 	}
 
 	indent--
 }
 
-func printIndent(){
+func (v *variable) printType(name string, vv interface{}) {
+	v.printIndent()
+	v.Out = fmt.Sprintf("%s%s(%T)\n", v.Out, name, vv)
+}
+
+func (v *variable) printValue(name string, vv interface{}) {
+	v.printIndent()
+	v.Out = fmt.Sprintf("%s%s(%T) %#v\n", v.Out, name, vv, vv)
+}
+
+func (v *variable) printIndent() {
 	var i int64
 	for i = 0; i < indent; i++ {
-		fmt.Printf("  ")
+		v.Out = fmt.Sprintf("%s  ", v.Out)
 	}
 }
 
-func printType(name string, v interface{}){
-	printIndent()
-	fmt.Printf("%s(%T)\n", name, v)
+// Print to standard out the value that is passed as the argument with indentation.
+// Pointers are dereferenced.
+func Dump(v interface{}) {
+	val := reflect.ValueOf(v)
+
+	dump := &variable{}
+	dump.Dump(val, "")
+	fmt.Printf("%s", dump.Out)
 }
 
-func printValue(name string, v interface{}){
-	printIndent()
-	fmt.Printf("%s(%T) %#v\n", name, v, v)
+func Sdump(v interface{}) string {
+	val := reflect.ValueOf(v)
+
+	dump := &variable{}
+	dump.Dump(val, "")
+	return dump.Out
 }

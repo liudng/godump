@@ -5,12 +5,10 @@
 package debug
 
 import (
-	"testing"
 	"go/parser"
 	"go/token"
-	"fmt"
+	"testing"
 )
-
 
 var emptyString = ""
 
@@ -29,29 +27,26 @@ type Circular struct {
 }
 
 func TestDump(t *testing.T) {
-	// empty
+	Dump(nil)
+	Dump(token.STRING)
+	Dump(&emptyString)
+	Dump([3]int{1, 2, 3})
+	Dump([]int{1, 2, 3})
+	Dump(&[][]int{[]int{1, 2, 3}, []int{1, 2, 3}, []int{1, 2, 3}})
+	Dump(map[string]int{"satu": 1, "dua": 2})
+	Dump(T{S{1, 2}, 3})
+	//Dump(T{A: 1, B: 2, C: 3})
 
-	// func ParseFile(filename string, src interface{}, scope *ast.Scope, mode uint) (*ast.File, os.Error)
+	/*bulet := make([]Circular, 3)
+	bulet[0].c = &bulet[1]
+	bulet[1].c = &bulet[2]
+	bulet[2].c = &bulet[0]
+	Dump(struct{ a []Circular }{bulet})*/
 
-	file, e := parser.ParseFile("dump_test.go", nil, nil, parser.ParseComments)
-	if e != nil {
-		fmt.Println("error", e)
-	} else {
-		//fmt.Printf("%#v\n", file);
-		Dump(file)
-		Dump(map[string]int{"satu": 1, "dua": 2})
-		Dump([]int{1, 2, 3})
-		Dump([3]int{1, 2, 3})
-		Dump(&[][]int{[]int{1, 2, 3}, []int{1, 2, 3}, []int{1, 2, 3}})
-		Dump(&emptyString)
-		Dump(T{S{1, 2}, 3})
-		Dump(token.STRING)
-
-		bulet := make([]Circular, 3)
-		bulet[0].c = &bulet[1]
-		bulet[1].c = &bulet[2]
-		bulet[2].c = &bulet[0]
-
-		Dump(struct{ a []Circular }{bulet})
+	fset := token.NewFileSet() // positions are relative to fset
+	file, err := parser.ParseFile(fset, "dump_test.go", nil, parser.ParseComments)
+	if err != nil {
+		t.Fatal(err)
 	}
+	Dump(file)
 }

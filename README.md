@@ -1,4 +1,8 @@
-## debug
+# debug
+
+[![Build Status](https://travis-ci.org/favframework/debug.svg)](https://travis-ci.org/favframework/debug)
+[![Coverage](http://gocover.io/_badge/github.com/favframework/debug)](http://gocover.io/github.com/favframework/debug)
+[![GoDoc](https://godoc.org/github.com/favframework/debug?status.png)](http://godoc.org/github.com/favframework/debug)
 
 ## Install
 
