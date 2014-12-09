@@ -10,15 +10,16 @@ import (
 	"strconv"
 )
 
-var indent int64 = -1
-
 type variable struct {
+	//
 	Out string
+
+	//
+	indent int64
 }
 
-func (v *variable) Dump(val reflect.Value, name string) {
-	indent++
-	//fmt.Printf("%#v\n", val.Interface())
+func (v *variable) dump(val reflect.Value, name string) {
+	v.indent++
 
 	if val.IsValid() {
 		typ := val.Type()
@@ -28,23 +29,23 @@ func (v *variable) Dump(val reflect.Value, name string) {
 			v.printType(name, val.Interface())
 			l := val.Len()
 			for i := 0; i < l; i++ {
-				v.Dump(val.Index(i), strconv.Itoa(i))
+				v.dump(val.Index(i), strconv.Itoa(i))
 			}
 		case reflect.Map:
 			v.printType(name, val.Interface())
 			//l := val.Len()
 			keys := val.MapKeys()
 			for _, k := range keys {
-				v.Dump(val.MapIndex(k), k.Interface().(string))
+				v.dump(val.MapIndex(k), k.Interface().(string))
 			}
 		case reflect.Ptr:
 			v.printType(name, val.Interface())
-			v.Dump(val.Elem(), name)
+			v.dump(val.Elem(), name)
 		case reflect.Struct:
 			v.printType(name, val.Interface())
 			for i := 0; i < typ.NumField(); i++ {
 				field := typ.Field(i)
-				v.Dump(val.FieldByIndex([]int{i}), field.Name)
+				v.dump(val.FieldByIndex([]int{i}), field.Name)
 			}
 		default:
 			v.printValue(name, val.Interface())
@@ -53,7 +54,7 @@ func (v *variable) Dump(val reflect.Value, name string) {
 		v.printValue(name, "nil")
 	}
 
-	indent--
+	v.indent--
 }
 
 func (v *variable) printType(name string, vv interface{}) {
@@ -68,7 +69,7 @@ func (v *variable) printValue(name string, vv interface{}) {
 
 func (v *variable) printIndent() {
 	var i int64
-	for i = 0; i < indent; i++ {
+	for i = 0; i < v.indent; i++ {
 		v.Out = fmt.Sprintf("%s  ", v.Out)
 	}
 }
@@ -77,16 +78,16 @@ func (v *variable) printIndent() {
 // Pointers are dereferenced.
 func Dump(v interface{}) {
 	val := reflect.ValueOf(v)
-
-	dump := &variable{}
-	dump.Dump(val, "")
+	dump := &variable{indent: -1}
+	dump.dump(val, "")
 	fmt.Printf("%s", dump.Out)
 }
 
+// Return the value that is passed as the argument with indentation.
+// Pointers are dereferenced.
 func Sdump(v interface{}) string {
 	val := reflect.ValueOf(v)
-
-	dump := &variable{}
-	dump.Dump(val, "")
+	dump := &variable{indent: -1}
+	dump.dump(val, "")
 	return dump.Out
 }
