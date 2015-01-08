@@ -1,13 +1,13 @@
-# debug
+# godump
 
-[![Build Status](https://travis-ci.org/favframework/debug.svg)](https://travis-ci.org/favframework/debug)
-[![Coverage](http://gocover.io/_badge/github.com/favframework/debug)](http://gocover.io/github.com/favframework/debug)
-[![GoDoc](https://godoc.org/github.com/favframework/debug?status.png)](http://godoc.org/github.com/favframework/debug)
+[![Build Status](https://travis-ci.org/liudng/godump.svg)](https://travis-ci.org/liudng/godump)
+[![Coverage](http://gocover.io/_badge/github.com/liudng/godump)](http://gocover.io/github.com/liudng/godump)
+[![GoDoc](https://godoc.org/github.com/liudng/godump?status.png)](http://godoc.org/github.com/liudng/godump)
 
 ## Install
 
 ```bash
-go get github.com/favframework/debug
+go get github.com/liudng/godump
 ```
 
 ## Sample code
@@ -16,7 +16,7 @@ go get github.com/favframework/debug
 package main
 
 import (
-	"github.com/favframework/debug"
+	"github.com/liudng/godump"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	a["A"] = 1
 	a["B"] = 2
 
-	debug.Dump(a)
+	godump.Dump(a)
 }
 ```
 
