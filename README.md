@@ -1,5 +1,7 @@
 # godump
 
+Dumps information about a variable. Now godump is part of [zhgo](https://github.com/zhgo/console) project.
+
 [![Build Status](https://travis-ci.org/liudng/godump.svg)](https://travis-ci.org/liudng/godump)
 [![Coverage](http://gocover.io/_badge/github.com/liudng/godump)](http://gocover.io/github.com/liudng/godump)
 [![GoDoc](https://godoc.org/github.com/liudng/godump?status.png)](http://godoc.org/github.com/liudng/godump)
