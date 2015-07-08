@@ -21,7 +21,7 @@ type variable struct {
 func (v *variable) dump(val reflect.Value, name string) {
 	v.indent++
 
-	if val.IsValid() {
+	if val.IsValid() && val.CanInterface() {
 		typ := val.Type()
 
 		switch typ.Kind() {
@@ -51,7 +51,7 @@ func (v *variable) dump(val reflect.Value, name string) {
 			v.printValue(name, val.Interface())
 		}
 	} else {
-		v.printValue(name, "nil")
+		v.printValue(name, "")
 	}
 
 	v.indent--
